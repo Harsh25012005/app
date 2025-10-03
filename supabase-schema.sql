@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
   name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
   phone_number TEXT,
+  password_hash TEXT, -- Store bcrypt hashed password
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
 );
@@ -36,12 +37,13 @@ CREATE POLICY "Users can insert own profile"
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.user_profiles (id, email, name, phone_number)
+  INSERT INTO public.user_profiles (id, email, name, phone_number, password_hash)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'phone_number', '')
+    COALESCE(NEW.raw_user_meta_data->>'phone_number', ''),
+    COALESCE(NEW.raw_user_meta_data->>'password_hash', '')
   );
   RETURN NEW;
 END;

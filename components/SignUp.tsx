@@ -20,7 +20,6 @@ export const SignUp = ({ onNavigateToSignIn }: SignUpProps) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -46,9 +45,6 @@ export const SignUp = ({ onNavigateToSignIn }: SignUpProps) => {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
 
     if (phoneNumber && !/^\+?[\d\s-()]+$/.test(phoneNumber)) {
       newErrors.phoneNumber = 'Phone number is invalid';
@@ -175,24 +171,6 @@ export const SignUp = ({ onNavigateToSignIn }: SignUpProps) => {
               )}
             </View>
 
-            {/* Confirm Password Input */}
-            <View className="mt-4">
-              <Text className="text-sm font-medium text-gray-700 mb-2">Confirm Password</Text>
-              <TextInput
-                className={`border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded-lg px-4 py-3 text-base`}
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: '' });
-                }}
-                secureTextEntry
-                editable={!loading}
-              />
-              {errors.confirmPassword && (
-                <Text className="text-red-500 text-xs mt-1">{errors.confirmPassword}</Text>
-              )}
-            </View>
 
             {/* Sign Up Button */}
             <TouchableOpacity

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { hashPassword } from '../lib/passwordUtils';
 
 interface UserProfile {
   id: string;
@@ -94,6 +95,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string, name: string, phoneNumber: string) => {
     try {
+      // Validate inputs
+      if (!password || typeof password !== 'string') {
+        return { error: { message: 'Password must be a valid string' } };
+      }
+      
+      // Hash the password before storing
+      const hashedPassword = await hashPassword(password.trim());
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -101,6 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           data: {
             name,
             phone_number: phoneNumber,
+            password_hash: hashedPassword, // Store hashed password in metadata
           },
         },
       });
@@ -118,6 +128,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               email,
               name,
               phone_number: phoneNumber,
+              password_hash: hashedPassword, // Store hashed password in user_profiles
             },
           ]);
 
